@@ -8,7 +8,7 @@
 
 ```
 git clone https://github.com/Amore52/ai_bot.git
-cd ai_bot.git
+cd ai_bot
 ```
 ### Создайте виртуальное окружение и установите зависимости:
 ```
