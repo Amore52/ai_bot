@@ -20,4 +20,3 @@ build/
 .pytest_cache/
 .DS_Store
 Thumbs.db
-credentials.json
