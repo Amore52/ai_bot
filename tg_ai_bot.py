@@ -1,9 +1,11 @@
+import os
+import logging
+
 from environs import Env
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
-import logging
 from google.cloud import dialogflow_v2beta1 as dialogflow
-import os
+
 
 
 logging.basicConfig(
