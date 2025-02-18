@@ -17,6 +17,9 @@ source .venv/bin/activate  # Для Linux/MacOS
 # .venv\Scripts\activate    # Для Windows
 pip install -r requirements.txt
 ```
+### Настройка Dialogflow:
+* Создайте агента в Dialogflow.
+* Скачайте API данные `credentials.json` и поместите в директорию проекта.
 
 ### Настройте переменные окружения:
 ```
