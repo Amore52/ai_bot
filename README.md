@@ -7,8 +7,8 @@
 ### Клонируйте репозиторий:
 
 ```
-git clone https://github.com/ваш-username/devman_ai_bot.git
-cd devman_ai_bot
+git clone https://github.com/Amore52/ai_bot.git
+cd ai_bot.git
 ```
 ### Создайте виртуальное окружение и установите зависимости:
 ```
