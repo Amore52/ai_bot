@@ -1,20 +1,16 @@
 import json
-import argparse
-
 from google.cloud import dialogflow_v2beta1 as dialogflow
+from environs import Env
 
 
 def create_intent(project_id, display_name, training_phrases_parts, message_texts):
     intents_client = dialogflow.IntentsClient()
     parent = dialogflow.AgentsClient.agent_path(project_id)
-    training_phrases = []
-    for part in training_phrases_parts:
-        part = dialogflow.Intent.TrainingPhrase.Part(text=part)
-        training_phrase = dialogflow.Intent.TrainingPhrase(parts=[part])
-        training_phrases.append(training_phrase)
-
-    text = dialogflow.Intent.Message.Text(text=message_texts)
-    message = dialogflow.Intent.Message(text=text)
+    training_phrases = [
+        dialogflow.Intent.TrainingPhrase(parts=[dialogflow.Intent.TrainingPhrase.Part(text=part)])
+        for part in training_phrases_parts
+    ]
+    message = dialogflow.Intent.Message(text=dialogflow.Intent.Message.Text(text=message_texts))
     intent = dialogflow.Intent(
         display_name=display_name,
         training_phrases=training_phrases,
@@ -28,17 +24,15 @@ def load_phrases(file_path):
         return json.load(file)
 
 
-def main(project_id):
+def main():
+    env = Env()
+    env.read_env()
+    project_id = env.str('DIALOGFLOW_PROJECT_ID')
+
     phrases = load_phrases('questions.json')
     for intent_name, data in phrases.items():
-        questions = data['questions']
-        answer = data['answer']
-        create_intent(project_id, intent_name, questions, [answer])
+        create_intent(project_id, intent_name, data['questions'], [data['answer']])
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Create Dialogflow intents.')
-    parser.add_argument('--project_id', type=str, required=True, help='ID проекта Dialogflow')
-    args = parser.parse_args()
-
-    main(args.project_id)
+    main()

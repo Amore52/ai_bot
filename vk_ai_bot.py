@@ -1,30 +1,20 @@
 import random
 import logging
-import argparse
 import vk_api
-
-from environs import Env
 from vk_api.longpoll import VkLongPoll, VkEventType
 from google.cloud import dialogflow_v2beta1 as dialogflow
 from google.api_core.exceptions import GoogleAPICallError
 from vk_api.exceptions import VkApiError
+from environs import Env
 
 logger = logging.getLogger(__file__)
 
-def create_handler(session_client, project_id, vk_api_session):
-    def handler(event):
-        handle_message(event, session_client, project_id, vk_api_session)
-    return handler
 
-
-def setup_vk_bot(dialogflow_project_id):
-    env = Env()
-    env.read_env()
-    vk_token = env.str('VK_TOKEN')
+def setup_vk_bot(vk_token, project_id):
     vk_session = vk_api.VkApi(token=vk_token)
     vk_api_session = vk_session.get_api()
     session_client = dialogflow.SessionsClient()
-    return vk_session, session_client, dialogflow_project_id, vk_api_session
+    return vk_session, session_client, project_id, vk_api_session
 
 
 def send_message(vk_api_session, user_id: int, message: str):
@@ -45,12 +35,10 @@ def detect_intent(session_client, project_id: str, session_id: str, text: str, l
         text_input = dialogflow.TextInput(text=text, language_code=language_code)
         query_input = dialogflow.QueryInput(text=text_input)
         response = session_client.detect_intent(session=session, query_input=query_input)
-        if response.query_result.intent.is_fallback is False:
-            return response.query_result.fulfillment_text
-        return None
+        return response.query_result.fulfillment_text if not response.query_result.intent.is_fallback else None
     except GoogleAPICallError as e:
         logger.error(f'Ошибка при обращении к Dialogflow: {e}')
-        return 'Произошла ошибка.'
+        return None
 
 
 def handle_message(event, session_client, project_id, vk_api_session):
@@ -62,10 +50,12 @@ def handle_message(event, session_client, project_id, vk_api_session):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Запуск VK бота с Dialogflow.')
-    parser.add_argument('--project_id', type=str, required=True, help='ID проекта Dialogflow')
-    args = parser.parse_args()
-    vk_session, session_client, project_id, vk_api_session = setup_vk_bot(args.project_id)
+    env = Env()
+    env.read_env()
+    vk_token = env.str('VK_TOKEN')
+    project_id = env.str('DIALOGFLOW_PROJECT_ID')
+
+    vk_session, session_client, project_id, vk_api_session = setup_vk_bot(vk_token, project_id)
     longpoll = VkLongPoll(vk_session)
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
