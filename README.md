@@ -37,12 +37,12 @@ DIALOGFLOW_PROJECT_ID=ваш_project_id
 ## 2.Запуск ботов
 
 Для запуска Telegram бота выполните:
-```commandline
-python tg_ai_bot.py
+```
+python tg_ai_bot.py --project_id 'id вашего проекта'
 ```
 Для запуска VK бота выполните:
-```commandline
-python vk_ai_bot.py
+```
+python vk_ai_bot.py --project_id 'id вашего проекта'
 ```
 ## 3.Функциональность
 ### Telegram бот:
@@ -66,5 +66,5 @@ python vk_ai_bot.py
 
 Используйте `intent_create.py` для создания интентов на основе данных из `questions.json`.
 ```
-python intent_create.py
+python intent_create.py --project_id 'id вашего проекта'
 ```
